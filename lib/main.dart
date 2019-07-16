@@ -5,6 +5,7 @@ import 'package:FukuiEvents/Models/Events.dart';
 import 'package:flutter_web/material.dart';
 import 'dart:async';
 import 'api.dart';
+import 'detail.dart';
 
 void main() => runApp(MyApp());
 
@@ -144,7 +145,10 @@ class _MyHomePageState extends State {
 										      ],
 									      ),
 									      onTap: (){
-
+													Navigator.push(context, MaterialPageRoute<Null>(
+														settings: const RouteSettings(name: "/detail"),
+														builder: (BuildContext context) => Detail(filteredEvents[index])
+													));
 									      },
 								      ),
 							      ],
