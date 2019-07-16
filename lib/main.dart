@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:FukuiEvents/Models/Events.dart';
 import 'package:flutter_web/material.dart';
@@ -48,7 +49,29 @@ class Debouncer {
 class _MyHomePageState extends State {
   var events = List<Events>();
   final _debouncer = Debouncer(milliseconds: 500);
-  List<Events> filteredEvents;
+  var filteredEvents = List<Events>();
+
+  void filterSearchResults(String query) {
+	  List<Events> dummySearchList = List<Events>();
+	  filteredEvents = events;
+	  dummySearchList = events;
+	  if(query.isNotEmpty) {
+		  dummySearchList = events.where((u) => (
+		      u.event_name.toLowerCase().contains(query.toLowerCase()) ||
+				  u.category.toLowerCase().contains(query.toLowerCase()) ||
+				  u.event_place.toLowerCase().contains(query.toLowerCase()))).toList();
+		  setState(() {
+			  filteredEvents = dummySearchList;
+		  });
+		  print(filteredEvents.length);
+		  return ;
+	  } else {
+		  setState(() {
+			  filteredEvents = events;
+		  });
+	  }
+
+  }
 
 
   _getEvents(){
@@ -56,13 +79,13 @@ class _MyHomePageState extends State {
 			setState(() {
 				Iterable list = json.decode(utf8.decode(response.bodyBytes));
 				events = list.map((model) => Events.fromJson(model)).toList();
+				filteredEvents = events;
 			});
 		});
   }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _getEvents();
   }
@@ -85,24 +108,20 @@ class _MyHomePageState extends State {
 				      onChanged: (string) {
 					      _debouncer.run(() {
 						      setState(() {
-							      filteredEvents = events
-								      .where((u) => (
-								          u.start_date.toLowerCase().contains(string.toLowerCase()) ||
-								          u.category.toLowerCase().contains(string.toLowerCase()) ||
-							            u.event_place.toLowerCase().contains(string.toLowerCase()))).toList();
+										filterSearchResults(string);
 						      });
 					      });
 				      },
 			      ),
 			      Expanded(child: ListView.builder(
-				      itemCount: events.length,
+				      itemCount: filteredEvents.length,
 				      itemBuilder: (context, index){
 				      	return Card(
 						      child: Column(
 							      children: <Widget>[
 								      ListTile(
 									      title: Text(
-										      events[index].event_name,
+										      filteredEvents[index].event_name,
 										      style: TextStyle(
 											      fontSize: 20.0, fontWeight: FontWeight.bold),
 									      ),
@@ -111,13 +130,13 @@ class _MyHomePageState extends State {
 										      crossAxisAlignment: CrossAxisAlignment.start,
 										      children: <Widget>[
 											      Text(
-												      events[index].event_place,
+												      filteredEvents[index].event_place,
 												      style: TextStyle(
 													      fontSize: 16.0,
 													      fontWeight: FontWeight.normal),
 											      ),
 											      Text(
-												      events[index].start_date,
+												      filteredEvents[index].start_date,
 												      style: TextStyle(
 													      fontSize: 14.0,
 													      fontWeight: FontWeight.bold),
