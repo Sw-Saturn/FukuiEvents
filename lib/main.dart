@@ -47,6 +47,7 @@ class Debouncer {
 	}
 }
 
+
 class _MyHomePageState extends State {
   var events = List<Events>();
   final _debouncer = Debouncer(milliseconds: 500);
@@ -56,7 +57,7 @@ class _MyHomePageState extends State {
 	  List<Events> dummySearchList = List<Events>();
 	  filteredEvents = events;
 	  dummySearchList = events;
-	  if(query.isNotEmpty) {
+	  if(query.isNotEmpty && query!=null) {
 		  dummySearchList = events.where((u) => (
 		      u.event_name.toLowerCase().contains(query.toLowerCase()) ||
 				  u.category.toLowerCase().contains(query.toLowerCase()) ||
@@ -86,6 +87,13 @@ class _MyHomePageState extends State {
   }
 
   @override
+  void dispose() {
+	  // Clean up the controller when the widget is removed from the
+	  // widget tree.
+	  super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
     _getEvents();
@@ -105,11 +113,17 @@ class _MyHomePageState extends State {
 				      decoration: InputDecoration(
 					      contentPadding: EdgeInsets.all(15.0),
 					      hintText: 'Filter...',
+					      prefixIcon: IconButton(
+						      icon: Icon(Icons.category),
+						      onPressed: (){
+
+						      },
+					      ),
 				      ),
-				      onChanged: (string) {
+				      onChanged: (text) {
 					      _debouncer.run(() {
 						      setState(() {
-										filterSearchResults(string);
+										filterSearchResults(text);
 						      });
 					      });
 				      },
