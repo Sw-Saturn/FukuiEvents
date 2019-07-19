@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:FukuiEvents/Models/Events.dart';
+import 'package:FukuiEvents/Models/Category.dart';
 import 'package:flutter_web/material.dart';
 import 'dart:async';
 import 'api.dart';
@@ -52,27 +53,177 @@ class _MyHomePageState extends State {
   var events = List<Events>();
   final _debouncer = Debouncer(milliseconds: 500);
   var filteredEvents = List<Events>();
+  final _category = Category();
 
   void filterSearchResults(String query) {
 	  List<Events> dummySearchList = List<Events>();
+	  List<Events> dummyCategoryList = List<Events>();
 	  filteredEvents = events;
 	  dummySearchList = events;
-	  if(query.isNotEmpty && query!=null) {
-		  dummySearchList = events.where((u) => (
-		      u.event_name.toLowerCase().contains(query.toLowerCase()) ||
+	  if (query.isNotEmpty && query != null) {
+		  dummySearchList = events.where((u) =>
+		  (
+			  u.event_name.toLowerCase().contains(query.toLowerCase()) ||
 				  u.category.toLowerCase().contains(query.toLowerCase()) ||
 				  u.event_place.toLowerCase().contains(query.toLowerCase()))).toList();
 		  setState(() {
 			  filteredEvents = dummySearchList;
 		  });
 		  print(filteredEvents.length);
-		  return ;
+		  return;
 	  } else {
 		  setState(() {
-			  filteredEvents = events;
+		  	_category.events_category.forEach((category,checked){
+		  		if(checked){
+		  			dummyCategoryList.addAll(filteredEvents.where((u) =>(
+					    u.category.toLowerCase().contains(category)
+					  )).toList());
+				  }
+			  });
+		  	filteredEvents = dummyCategoryList;
 		  });
 	  }
+  }
 
+
+  _displayDialog(BuildContext context) async{
+	  return showDialog(
+		  context: context,
+		  builder: (context) {
+			  return AlertDialog(
+				  content: Column (
+					  crossAxisAlignment: CrossAxisAlignment.stretch,
+					  mainAxisSize: MainAxisSize.min,
+					  children: <Widget>[
+						  CheckboxListTile(
+							  title: Text(Category.history),
+							  value: _category.events_category[Category.history],
+							  onChanged: (val) => {
+								  setState(() {
+									  _category.events_category[Category.history] = val;
+									  Navigator.of(context).pop();
+									  _displayDialog(context);
+								  })
+							  },
+						  ),
+						  CheckboxListTile(
+							  title: Text(Category.nature),
+							  value: _category.events_category[Category.nature],
+							  onChanged: (val) => {
+								  setState(() {
+									  _category.events_category[Category.nature] = val;
+									  Navigator.of(context).pop();
+									  _displayDialog(context);
+								  })
+							  },
+						  ),
+						  CheckboxListTile(
+							  title: Text(Category.seminar),
+							  value: _category.events_category[Category.seminar],
+							  onChanged: (val) => {
+								  setState(() {
+									  _category.events_category[Category.seminar] = val;
+									  Navigator.of(context).pop();
+									  _displayDialog(context);
+								  })
+							  },
+						  ),
+						  CheckboxListTile(
+							  title: Text(Category.kids),
+							  value: _category.events_category[Category.kids],
+							  onChanged: (val) => {
+								  setState(() {
+									  _category.events_category[Category.kids] = val;
+									  Navigator.of(context).pop();
+									  _displayDialog(context);
+								  })
+							  },
+						  ),
+						  CheckboxListTile(
+							  title: Text(Category.other),
+							  value: _category.events_category[Category.other],
+							  onChanged: (val) => {
+								  setState(() {
+									  _category.events_category[Category.other] = val;
+									  Navigator.of(context).pop();
+									  _displayDialog(context);
+								  })
+							  },
+						  ),
+						  CheckboxListTile(
+							  title: Text(Category.culture),
+							  value: _category.events_category[Category.culture],
+							  onChanged: (val) => {
+								  setState(() {
+									  _category.events_category[Category.culture] = val;
+									  Navigator.of(context).pop();
+									  _displayDialog(context);
+								  })
+							  },
+						  ),
+						  CheckboxListTile(
+							  title: Text(Category.health),
+							  value: _category.events_category[Category.health],
+							  onChanged: (val) => {
+								  setState(() {
+									  _category.events_category[Category.health] = val;
+									  Navigator.of(context).pop();
+									  _displayDialog(context);
+								  })
+							  },
+						  ),
+						  CheckboxListTile(
+							  title: Text(Category.sports),
+							  value: _category.events_category[Category.sports],
+							  onChanged: (val) => {
+								  setState(() {
+									  _category.events_category[Category.sports] = val;
+									  Navigator.of(context).pop();
+									  _displayDialog(context);
+								  })
+							  },
+						  ),
+						  CheckboxListTile(
+							  title: Text(Category.music),
+							  value: _category.events_category[Category.music],
+							  onChanged: (val) => {
+								  setState(() {
+									  _category.events_category[Category.music] = val;
+									  Navigator.of(context).pop();
+									  _displayDialog(context);
+								  })
+							  },
+						  ),
+						  CheckboxListTile(
+							  title: Text(Category.festival),
+							  value: _category.events_category[Category.festival],
+							  onChanged: (val) => {
+								  setState(() {
+									  _category.events_category[Category.festival] = val;
+									  Navigator.of(context).pop();
+									  _displayDialog(context);
+								  })
+							  },
+						  ),
+					  ],
+				  ),
+				  title: Text("表示カテゴリ設定"),
+				  actions: <Widget>[
+					  FlatButton(
+						  child: Text("OK"),
+						  onPressed: () {
+							  _debouncer.run(() {
+								  setState(() {
+									  filterSearchResults('');
+								  });
+							  });
+							  Navigator.pop(context);
+						  }
+					  ),
+				  ],
+			  );
+		  },
+	  );
   }
 
 
@@ -116,7 +267,7 @@ class _MyHomePageState extends State {
 					      prefixIcon: IconButton(
 						      icon: Icon(Icons.category),
 						      onPressed: (){
-
+										_displayDialog(context);
 						      },
 					      ),
 				      ),
